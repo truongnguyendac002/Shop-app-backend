@@ -21,7 +21,6 @@ import java.util.List;
 public class OrderDetailController {
     private final OrderDetailService orderDetailService;
     private final LocalizationUtils localizationUtils;
-    //Thêm mới 1 order detail
     @PostMapping("")
     public ResponseEntity<?> createOrderDetail(
             @Valid  @RequestBody OrderDetailDTO orderDetailDTO) {
@@ -39,7 +38,6 @@ public class OrderDetailController {
         OrderDetail orderDetail = orderDetailService.getOrderDetail(id);
         return ResponseEntity.ok().body(OrderDetailResponse.fromOrderDetail(orderDetail));
     }
-    //lấy ra danh sách các order_details của 1 order nào đó
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?> getOrderDetails(
             @Valid @PathVariable("orderId") Long orderId

@@ -62,7 +62,6 @@ public class ProductService implements IProductService{
     @Override
     public Page<ProductResponse> getAllProducts(String keyword,
                                                 Long categoryId, PageRequest pageRequest) {
-        // Lấy danh sách sản phẩm theo trang (page), giới hạn (limit), và categoryId (nếu có)
         Page<Product> productsPage;
         productsPage = productRepository.searchProducts(categoryId, keyword, pageRequest);
         return productsPage.map(ProductResponse::fromProduct);
@@ -76,8 +75,6 @@ public class ProductService implements IProductService{
             throws Exception {
         Product existingProduct = getProductById(id);
         if(existingProduct != null) {
-            //copy các thuộc tính từ DTO -> Product
-            //Có thể sử dụng ModelMapper
             Category existingCategory = categoryRepository
                     .findById(productDTO.getCategoryId())
                     .orElseThrow(() ->
@@ -119,7 +116,6 @@ public class ProductService implements IProductService{
                 .product(existingProduct)
                 .imageUrl(productImageDTO.getImageUrl())
                 .build();
-        //Ko cho insert quá 5 ảnh cho 1 sản phẩm
         int size = productImageRepository.findByProductId(productId).size();
         if(size >= ProductImage.MAXIMUM_IMAGES_PER_PRODUCT) {
             throw new InvalidParamException(

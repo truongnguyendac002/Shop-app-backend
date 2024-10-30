@@ -35,9 +35,7 @@ public class UserService implements IUserService{
     @Override
     @Transactional
     public User createUser(UserDTO userDTO) throws Exception {
-        //register user
         String phoneNumber = userDTO.getPhoneNumber();
-        // Kiểm tra xem số điện thoại đã tồn tại hay chưa
         if(userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
         }
@@ -47,7 +45,6 @@ public class UserService implements IUserService{
         if(role.getName().toUpperCase().equals(Role.ADMIN)) {
             throw new PermissionDenyException("You cannot register an admin account");
         }
-        //convert from userDTO => user
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
                 .phoneNumber(userDTO.getPhoneNumber())
@@ -61,7 +58,6 @@ public class UserService implements IUserService{
 
         newUser.setRole(role);
 
-        // Kiểm tra nếu có accountId, không yêu cầu password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
             String password = userDTO.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
@@ -80,9 +76,7 @@ public class UserService implements IUserService{
         if(optionalUser.isEmpty()) {
             throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
         }
-        //return optionalUser.get();//muốn trả JWT token ?
         User existingUser = optionalUser.get();
-        //check password
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() == 0) {
             if(!passwordEncoder.matches(password, existingUser.getPassword())) {
@@ -101,25 +95,21 @@ public class UserService implements IUserService{
                 existingUser.getAuthorities()
         );
 
-        //authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
     }
     @Transactional
     @Override
     public User updateUser(Long userId, UpdateUserDTO updatedUserDTO) throws Exception {
-        // Find the existing user by userId
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
 
-        // Check if the phone number is being changed and if it already exists for another user
         String newPhoneNumber = updatedUserDTO.getPhoneNumber();
         if (!existingUser.getPhoneNumber().equals(newPhoneNumber) &&
                 userRepository.existsByPhoneNumber(newPhoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
         }
 
-        // Update user information based on the DTO
         if (updatedUserDTO.getFullName() != null) {
             existingUser.setFullName(updatedUserDTO.getFullName());
         }
@@ -139,7 +129,6 @@ public class UserService implements IUserService{
             existingUser.setGoogleAccountId(updatedUserDTO.getGoogleAccountId());
         }
 
-        // Update the password if it is provided in the DTO
         if (updatedUserDTO.getPassword() != null
                 && !updatedUserDTO.getPassword().isEmpty()) {
             if(!updatedUserDTO.getPassword().equals(updatedUserDTO.getRetypePassword())) {
@@ -149,8 +138,6 @@ public class UserService implements IUserService{
             String encodedPassword = passwordEncoder.encode(newPassword);
             existingUser.setPassword(encodedPassword);
         }
-        //existingUser.setRole(updatedRole);
-        // Save the updated user
         return userRepository.save(existingUser);
     }
 

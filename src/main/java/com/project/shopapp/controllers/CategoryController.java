@@ -27,12 +27,9 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
-    private final LocaleResolver localeResolver;
-    private final MessageSource messageSource;
     private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
-    //Nếu tham số truyền vào là 1 object thì sao ? => Data Transfer Object = Request Object
     public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CategoryDTO categoryDTO,
             BindingResult result) {
@@ -51,7 +48,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponse);
     }
 
-    //Hiện tất cả các categories
     @GetMapping("")
     public ResponseEntity<List<Category>> getAllCategories(
             @RequestParam("page")     int page,
