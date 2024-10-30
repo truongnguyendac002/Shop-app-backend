@@ -1,5 +1,5 @@
 server:
-  port: 8088  
+  port: 8080
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shopapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
